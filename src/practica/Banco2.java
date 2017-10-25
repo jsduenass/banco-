@@ -31,7 +31,7 @@ public class Banco2 {
 
         //crear arbol
         SegTree tree = new SegTree(arreglo, 0, N -1);
-        tree.enorden(tree);
+
         int Q = sc.nextInt();
         int i, j;
         double di, ri;
@@ -118,12 +118,6 @@ class Data {
     public void setSum(double sum) {
         this.sum = sum;
     }
-
-    @Override
-    public String toString() {
-        return "Data{" + "mn=" + mn + ", mx=" + mx + ", sum=" + sum + '}';
-    }
-    
 }
 
 class SegTree {
@@ -140,17 +134,6 @@ class SegTree {
 
     public void setValor(Data valor) {
         this.valor = valor;
-    }
-     void enorden(SegTree x){
-        if(x!=null){
-            enorden(x.izq);
-            
-            System.out.println("[" + x.from + ", " + x.to + "] " + x.valor.toString() );
-            
-            enorden(x.der);
-           
-            
-        }
     }
 
     public SegTree(double[] arreglo, int from, int to) {
@@ -179,9 +162,9 @@ class SegTree {
     Data query(int f, int t) {
         if (from == f && to == t) {
             return getValor();
-        } else if (t < izq.to) {
+        } else if (t <= izq.to) {
             return izq.query(f, t);
-        } else if (f > der.from) {
+        } else if (f >= der.from) {
             return der.query(f, t);
         } else {
             return mergeData(izq.query(f, izq.to), der.query(der.from, t));
