@@ -128,14 +128,6 @@ class SegTree {
     SegTree der;
     Data valor;
     
-    public Data getValor() {
-        return valor;
-    }
-
-    public void setValor(Data valor) {
-        this.valor = valor;
-    }
-
     public SegTree(double[] arreglo, int from, int to) {
         this.from = from;
         this.to = to;
@@ -149,6 +141,14 @@ class SegTree {
         izq = new SegTree(arreglo, from, mid);
         der = new SegTree(arreglo, mid + 1, to);
         valor = mergeData(izq.valor, der.valor);
+    }
+    
+    public Data getValor() {
+        return valor;
+    }
+
+    public void setValor(Data valor) {
+        this.valor = valor;
     }
 
     Data mergeData(Data a, Data b) {
