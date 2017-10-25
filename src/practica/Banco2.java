@@ -30,13 +30,13 @@ public class Banco2 {
         }
 
         //crear arbol
-        SegTree tree = new SegTree(arreglo, 0, N -1);
+        SegTree tree = new SegTree(arreglo, 0, N - 1);
 
         int Q = sc.nextInt();
         int i, j;
         double di, ri;
         String cmd;
-        
+
         for (int k = 0; k < Q; k++) {
             cmd = sc.next();
 
@@ -45,13 +45,16 @@ public class Banco2 {
                 i = sc.nextInt();
                 di = Double.parseDouble(sc.next());
                 tree.actualizar(i - 1, di);
+//                System.out.println("\n\ndespues de retirar");
+//                tree.enorden(tree);
 
             }
             if (cmd.equals("retirar")) {
                 i = sc.nextInt();
                 ri = Double.parseDouble(sc.next());
                 tree.actualizar(i - 1, -ri);
-
+                //System.out.println("\n\ndespues de retirar");
+                // tree.enorden(tree);
             }
             if (cmd.equals("consultar")) {
                 i = sc.nextInt();
@@ -61,7 +64,7 @@ public class Banco2 {
                 double mx = d.mx;
                 double promedio = d.sum / (double) (j + 1 - i);
                 //System.out.println(mn+" "+mx+" "+d.sum);
-                System.out.println(redondear(mn) + " " + redondear(mx) + " " + redondear(promedio));
+                System.out.println(redondear(mn) + " " + redondear(mx) + " " + redondear9(promedio));
                 // System.out.println(tree.toString());
 
             }
@@ -79,13 +82,27 @@ public class Banco2 {
         return (ans / 10) + "." + (ans % 10);
     }
 
+    static double redondear9(double x) {
+        x *= 10;
+        if (x % 1 >= 0.5) {
+            if (x % 1 == 0.5) {
+                if (x % 10 % 2 == 0) {
+                    return (x - x % 1) / 10;
+
+                }
+            }
+            return (x - x % 1 + 1) / 10;
+        }
+        return (x - x % 1) / 10;
+    }
+
     static double redondear(double x) {
         long y = (long) (x * 100.0);
         int cast = (int) y;
         int ans = cast / 10;
-        
-        if(cast % 10 <= 4) {
-            return ((double) (ans)) / 10; 
+
+        if (cast % 10 <= 4) {
+            return ((double) (ans)) / 10;
         }
         return (((double) (ans + 1)) / 10);
     }
@@ -118,6 +135,12 @@ class Data {
     public void setSum(double sum) {
         this.sum = sum;
     }
+
+    @Override
+    public String toString() {
+        return "={" + "mn=" + mn + ", mx=" + mx + ", sum=" + sum + '}';
+    }
+
 }
 
 class SegTree {
@@ -127,7 +150,7 @@ class SegTree {
     SegTree izq;
     SegTree der;
     Data valor;
-    
+
     public SegTree(double[] arreglo, int from, int to) {
         this.from = from;
         this.to = to;
@@ -142,7 +165,7 @@ class SegTree {
         der = new SegTree(arreglo, mid + 1, to);
         valor = mergeData(izq.valor, der.valor);
     }
-    
+
     public Data getValor() {
         return valor;
     }
@@ -183,4 +206,20 @@ class SegTree {
             return valor = mergeData(izq.valor, der.actualizar(i, x));
         }
     }
+
+    void enorden(SegTree x) {
+        if (x != null) {
+            enorden(x.izq);
+            System.out.println(x.toString());
+
+            enorden(x.der);
+
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "[" + from + ',' + to + ']' + this.valor.toString();
+    }
+
 }
