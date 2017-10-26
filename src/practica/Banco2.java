@@ -100,11 +100,17 @@ public class Banco2 {
         long y = (long) (x * 100.0);
         int cast = (int) y;
         int ans = cast / 10;
-
-        if (cast % 10 <= 4) {
-            return ((double) (ans)) / 10;
+        if (cast % 2 == 0) {
+            if (cast % 10 <= 5) {
+                return ((double) (ans)) / 10;
+            }
+            return (((double) (ans + 1)) / 10);
+        } else {
+            if (cast % 10 <= 4) {
+                return ((double) (ans)) / 10;
+            }
+            return (((double) (ans + 1)) / 10);
         }
-        return (((double) (ans + 1)) / 10);
     }
 
 }
