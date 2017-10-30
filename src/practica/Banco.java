@@ -13,217 +13,219 @@ import java.util.Scanner;
  *
  * @author juan sebastian
  */
-class SegmentTree{
-    ST_Node raiz;
-    double entrada[];
-    //ST_Node sTree[];
+public class Banco {
 
-    public SegmentTree(double[] entrada) {
-        this.entrada = entrada;
-        if(entrada.length==0){
-            raiz=null;
-        } else 
-             raiz = buildNode(entrada, 0, entrada.length - 1);    
-    }
-    
-     private ST_Node buildNode(double[] nums, int begin, int end) {
-        if (begin == end) {
-            return new ST_Node(begin, end, null, null,nums[begin],nums[begin],nums[begin]);
-        } else {
-            int mid = (begin + end) / 2 + 1;
-            ST_Node left = buildNode(nums, begin, mid - 1);
-            ST_Node right = buildNode(nums, mid, end);
-            return new ST_Node(begin, end, left, right,left.sum + right.sum,this.findMax(left.Max,right.Max),this.findMin(left.min,right.min));
+    public static void main(String[] args) throws FileNotFoundException {
+
+        File f = new File("practica.txt");
+        Scanner sc = new Scanner(f);
+        while (!sc.nextLine().equals("Banco")) {
         }
-    }
-    
-     private double update(ST_Node node, int i, int val) {
-        if (node.isSingle()) {
-            node.setSum(val);
-        } else {
-            ST_Node nodeToUpdate = node.left.contains(i) ? node.left : node.right;
-            double withoutNode = node.sum - nodeToUpdate.sum;
-            node.setSum(withoutNode + update(nodeToUpdate, i, val));
+
+        int N = sc.nextInt();
+        double arreglo[] = new double[N];
+
+        for (int i = 0; i < N; i++) {
+            arreglo[i] = Double.parseDouble(sc.next());
         }
-        return node.sum;
-    }
-     public double sumRange(int i, int j) {
-        if (raiz == null) {
-            return 0;
+
+        //crear arbol
+        SegTree tree = new SegTree(arreglo, 0, N - 1);
+
+        int Q = sc.nextInt();
+        int i, j;
+        double di, ri;
+        String cmd;
+
+        for (int k = 0; k < Q; k++) {
+            cmd = sc.next();
+
+            if (cmd.equals("depositar")) {
+
+                i = sc.nextInt();
+                di = Double.parseDouble(sc.next());
+                tree.actualizar(i - 1, di);
+//                System.out.println("\n\ndespues de retirar");
+//                tree.enorden(tree);
+
+            }
+            if (cmd.equals("retirar")) {
+                i = sc.nextInt();
+                ri = Double.parseDouble(sc.next());
+                tree.actualizar(i - 1, -ri);
+                //System.out.println("\n\ndespues de retirar");
+                // tree.enorden(tree);
+            }
+            if (cmd.equals("consultar")) {
+                i = sc.nextInt();
+                j = sc.nextInt();
+                Data d = tree.query(i - 1, j - 1);
+                double mn = d.mn;
+                double mx = d.mx;
+                double promedio = d.sum / (double) (j + 1 - i);
+                //System.out.println(mn+" "+mx+" "+d.sum);
+                System.out.println(redondear(mn) + " " + redondear(mx) + " " + redondear9(promedio));
+                // System.out.println(tree.toString());
+
+            }
+
         }
-        return sumRange(raiz, i, j);
+
     }
 
-    private double sumRange(ST_Node node, int i, int j) {
-        if (node.outside(i, j)) {
-            return 0;
-        } else if (node.inside(i, j)) {
-            return node.sum;
+    static String redondear1(double x) {
+        long y = (long) (x * 100.0);
+        long ans = y / 10;
+        if (y % 10 >= 5) {
+            ans++;
+        }
+        return (ans / 10) + "." + (ans % 10);
+    }
+
+    static double redondear9(double x) {
+        x *= 10;
+        if (x % 1 >= 0.5) {
+            if (x % 1 == 0.5) {
+                if (x % 10 % 2 == 0) {
+                    return (x - x % 1) / 10;
+
+                }
+            }
+            return (x - x % 1 + 1) / 10;
+        }
+        return (x - x % 1) / 10;
+    }
+
+    static double redondear(double x) {
+        long y = (long) (x * 100.0);
+        int cast = (int) y;
+        int ans = cast / 10;
+        if (cast % 2 == 0) {
+            if (cast % 10 <= 5) {
+                return ((double) (ans)) / 10;
+            }
+            return (((double) (ans + 1)) / 10);
         } else {
-            return sumRange(node.left, i, j) + sumRange(node.right, i, j);
+            if (cast % 10 <= 4) {
+                return ((double) (ans)) / 10;
+            }
+            return (((double) (ans + 1)) / 10);
         }
     }
-    ST_Node limIzquierdo(int i,ST_Node x){
-        if(i==x.begin)
-            return x;
-        
-        if(i<x.end)
-            return x.left;
-        else 
-            return x.right;
-      
-    }
-    ST_Node limDerecho(int j,ST_Node x){
-        if(j==x.end)
-            return x;
-        
-        if(j<x.begin)
-            return x.left;
-        else 
-            return x.right;
-      
-    }
-    
-     double findMin(int i,int j){
-        ST_Node izquierdo= this.limIzquierdo(i, raiz);
-        ST_Node derecho= this.limDerecho(j, raiz);
-        return findMin(izquierdo.min,derecho.min);
-         
-     }
-     double findMin(double x1, double x2){
-         if(x1<x2)
-             return x1;
-         else
-             return x2;
-         
-     }
-     double findMax(double x1, double x2){
-         if(x1>x2)
-             return x1;
-         else
-             return x2;
-         
-     }
-     
-      
-    void preorden(ST_Node x){
-        if(x!= null){
-            
-            System.out.println(x.toString());
-            preorden(x.left);
-            
-            preorden(x.right);
-            System.out.println("  d   ");
-                       
-        }
-              
-    }
-     void postorden(ST_Node x){
-        if(x!=null){
-            postorden(x.left);
-            postorden(x.right);
-            System.out.println(x.toString());
-        }
-    }
-    
+
 }
-class ST_Node{
-    int begin;
-    int end;
-    ST_Node left;
-    ST_Node right;
+
+class Data {
+
+    double mn;
+    double mx;
     double sum;
-    double min;
-     double Max;
-   
-    
 
-    public ST_Node(int begin, int end, ST_Node left, ST_Node right, double sum, double Max, double min ) {
-        this.begin = begin;
-        this.end = end;
-        this.left = left;
-        this.right = right;
-        this.sum = sum;
-        this.Max = Max;
-        this.min = min;
-        
-        
+    public Data(double x) {
+        mn = mx = sum = x;
+
     }
-    
-    public boolean isSingle() {
-            return begin == end;
-        }
 
-        public boolean contains(int i) {
-            return i >= begin && i <= end;
-        }
+    void setAll(double x) {
+        mn = mx = sum = x;
+    }
 
-        public boolean inside(int i, int j) {
-            return i <= begin && j >= end;
-        }
+    public void setMn(double mn) {
+        this.mn = mn;
+    }
 
-        public boolean outside(int i, int j) {
-            return i > end || j < begin;
-        }
-        
-        public void setSum(double sum) {
-            this.sum = sum;
-        }
+    public void setMx(double mx) {
+        this.mx = mx;
+    }
+
+    public void setSum(double sum) {
+        this.sum = sum;
+    }
 
     @Override
     public String toString() {
-        return "ST_Node{" + "[" + begin+ ", " + end + "] ,sum="+ sum  + ", Max=" + Max + ", min="+ min  + '}';
+        return "={" + "mn=" + mn + ", mx=" + mx + ", sum=" + sum + '}';
     }
-        
- 
+
 }
 
+class SegTree {
 
-public class Banco {
-    public static void main(String[] args) throws FileNotFoundException{
-       
-        File f= new File("practica.txt");
-        Scanner sc = new Scanner(f);
-        while(!sc.next().equals("Banco")){}
-        
-        int N=sc.nextInt();
-        double arreglo[]= new double[N];
-        
-        
-        for (int i = 0; i < N; i++) {
-            arreglo[i]=Double.parseDouble(sc.next());
-            System.out.print(arreglo[i]+" ");
+    int from;
+    int to;
+    SegTree izq;
+    SegTree der;
+    Data valor;
+
+    public SegTree(double[] arreglo, int from, int to) {
+        this.from = from;
+        this.to = to;
+        if (from == to) {
+            valor = new Data(arreglo[from]);
+            izq = null;
+            der = null;
+            return;
         }
-        
-        
-        //crear arbol
-        System.out.println("");
-        SegmentTree cuentas= new SegmentTree(arreglo);
-        //cuentas.preorden(cuentas.raiz);
-        System.out.println(" "+cuentas.limIzquierdo(3, cuentas.raiz).toString()+" ");
-        System.out.println(cuentas.findMin(3, 5)+" ");
-        System.out.println("");
-       cuentas.postorden(cuentas.raiz);
-       // System.out.println());
-        int Q= sc.nextInt();
-        int i,j,di,ri;
-        String cmd;
-        for (int k = 0; k < Q; k++) {
-            cmd=sc.nextLine();
-            if(cmd.equals("depositar")){
-                i=sc.nextInt();
-                di=sc.nextInt();
-                
-            }
-            if(cmd.equals("retirar")){
-                i=sc.nextInt();
-                ri=sc.nextInt();
-            }
-            if(cmd.equals("consultar")){
-                i=sc.nextInt();
-                j=sc.nextInt();
-            }
-            
+        int mid = (from + to) / 2;
+        izq = new SegTree(arreglo, from, mid);
+        der = new SegTree(arreglo, mid + 1, to);
+        valor = mergeData(izq.valor, der.valor);
+    }
+
+    public Data getValor() {
+        return valor;
+    }
+
+    public void setValor(Data valor) {
+        this.valor = valor;
+    }
+
+    Data mergeData(Data a, Data b) {
+        Data rta = new Data(0);
+        rta.setSum(a.sum + b.sum);
+        rta.setMn(a.mn <= b.mn ? a.mn : b.mn);
+        rta.setMx(a.mx >= b.mx ? a.mx : b.mx);
+        return rta;
+    }
+
+    Data query(int f, int t) {
+        if (from == f && to == t) {
+            return getValor();
+        } else if (t <= izq.to) {
+            return izq.query(f, t);
+        } else if (f >= der.from) {
+            return der.query(f, t);
+        } else {
+            return mergeData(izq.query(f, izq.to), der.query(der.from, t));
+        }
+
+    }
+
+    Data actualizar(int i, double x) {
+        if (from == i && to == i) {
+            valor.setAll(x + valor.mn);
+            return valor;
+        } else if (i <= izq.to) {
+            return valor = mergeData(izq.actualizar(i, x), der.valor);
+
+        } else {
+            return valor = mergeData(izq.valor, der.actualizar(i, x));
         }
     }
+
+    void enorden(SegTree x) {
+        if (x != null) {
+            enorden(x.izq);
+            System.out.println(x.toString());
+
+            enorden(x.der);
+
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "[" + from + ',' + to + ']' + this.valor.toString();
+    }
+
 }
