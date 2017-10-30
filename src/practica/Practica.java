@@ -18,7 +18,6 @@ class BinaryTree<T>{
     class BinaryNode <T>{
         int clave;
         T value;
-        BinaryNode padre;
         BinaryNode izquierdo;
         BinaryNode derecho;
 
@@ -37,12 +36,15 @@ class BinaryTree<T>{
     
     BinaryNode insertar(int clave, T value, BinaryNode t){
         if(t==null){
+           // System.out.println("C");
             return new BinaryNode(clave,value);
         }
         if(clave> t.clave){
+            //System.out.println("R");
             t.derecho= insertar(clave,value,t.derecho);
         }
         if(clave< t.clave){
+            //System.out.println("L");
             t.izquierdo= insertar(clave,value,t.izquierdo);
         }
          return t;
@@ -52,7 +54,7 @@ class BinaryTree<T>{
     void preorden(BinaryNode x){
         if(x!= null){
             
-            System.out.print(x.value.toString()+" ");
+           // System.out.print(x.value.toString()+" ");
             preorden(x.izquierdo);
             recorrido+="i";
             preorden(x.derecho);
@@ -67,7 +69,7 @@ class BinaryTree<T>{
         if(x!=null){
             postorden(x.izquierdo);
             postorden(x.derecho);
-            System.out.print(x.value.toString()+" ");
+           // System.out.print(x.value.toString()+" ");
         }
     }
     
@@ -75,7 +77,7 @@ class BinaryTree<T>{
         if(x!=null){
             enorden(x.izquierdo);
             recorrido+="i";
-            System.out.print(x.value.toString()+" , ");
+           // System.out.print(x.value.toString()+" , ");
             
             enorden(x.derecho);
             recorrido+="d";
@@ -145,6 +147,7 @@ public class Practica {
             arbol[i]= new BinaryTree();
             for (int j = 0; j < k; j++) {
                 x= sc.nextInt();
+              //  System.out.println("->"+x);
                 arbol[i].raiz=arbol[i].insertar(x, x, arbol[i].raiz);
                 //System.out.println(x);
             }
@@ -154,12 +157,10 @@ public class Practica {
         int diferentes= n; // numero de arboles diferentes 
         
         for (int i = 0; i < n; i++) { // compara el arbol i con los arboles j>i 
-            for (int j = i+1; j < n; j++) {
-                System.out.println(diferentes+" "+i+" "+j);
+            for (int j = 0; j < i; j++) {
                 if(arbol[i].comparar(arbol[i].raiz,arbol[j].raiz)){// si el arbol i igual a j pasa al siguiete  
-                    i++;
                    diferentes--;
-                    
+                   break;
                 }
             }
         }

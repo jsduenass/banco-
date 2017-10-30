@@ -15,139 +15,96 @@ import java.util.Scanner;
  */
  class DisjointSet {
     int rango[] ;
-    int rango2[];
     int A[];
     int R[];
     
     public DisjointSet(int n){
-        rango= new int [n];
-        rango2= new int [n];
         A= new int [n];
         R= new int [n+1];
-        for (int i = 0; i < 10; i++) {
+        rango= new int [n];
+        
+        for (int i = 0; i < n; i++) {
             A[i]=i;
-            R[i]=n+1;
+            R[i]=n;
         }
     }
-    int alianza(int x){
+    int representante(int x){
         if(A[x]==x)
             return x;
         else 
-            return alianza(A[x]);
+            return representante(A[x]);
     }
-    int rival(int x){
-        
-        if(R[x]==R.length)
-            return R.length;
-        else 
-            return rival(R[x]);
+   
+    
+    int merge(int ax,int ay){//une dos representantes
+        if(ax==A.length)
+           return ay;
+        if(ay==A.length)
+            return ax;
+        if(rango[ax]<rango[ay]){
+            A[ax]=ay;
+            return  A[ax];
+        }else 
+            A[ay]=ax;
+            if(rango[ax]==rango[ay])
+                rango[ax]++;
+            return  A[ay];  
     }
-    boolean alianza(int i,int j){
-        System.out.println(i+" A:"+alianza(i)+"   "+j+" A:"+alianza(j));
-        return alianza(i)==alianza(j);
+    
+    boolean alianza(int x,int y){
+        int ax=this.representante(x);
+        int ay=this.representante(y);
+        this.print(x, y);
+        return ax==ay&&R[ax]==R[ay];
     }
-    boolean rival(int i,int j){
-         System.out.println(i+" R:"+rival(i)+"   "+j+" R:"+rival(j));
-         if(rival(i)==R.length||rival(j)==R.length)
-             return false;
-        else
-        return rival(i)==rival(j);
+    boolean rival(int x,int y){
+        int ax=this.representante(x);
+        int ay=this.representante(y);
+        this.print(x, y);
+        return ax==R[ay]&&ay==R[ax];
     }
     boolean formarAlianza(int x, int y){
-        int ax=this.alianza(x);
-        int ay= this.alianza(y);
-        int rx=this.rival(x);
-        int ry=this.rival(y);
-        System.out.println(x+" A:"+ax+" R:"+rx+"    "+y+" A:"+ay+" R:"+ry);
-        if(ax!=ry &&ay!=rx){
-            System.out.println("formada");
-            if(rango[ax]<rango[ay]){
-                A[ax]=ay;
-            }else{
-                A[ay]=ax;
-                if(rango[ax]==rango[ay])
-                    rango[ay]++;
-            }
-            return true;
-        }
-        return false;        
-    }
-    
-    boolean formarRival(int x, int y){
-        int ax=this.alianza(x);
-        int ay= this.alianza(y);
-        int rx=this.rival(x);
-        int ry=this.rival(y);
-        System.out.println(x+" A:"+ax+" R:"+rx+"    "+y+" A:"+ay+" R:"+ry);
-        if(ax!=ry &&ay!=rx){
-            System.out.println("formada");
-            if(rango2[ax]<rango2[ay]){
-                R[ax]=ay;
-            }else{
-                R[ay]=ax;
-                if(rango2[ax]==rango2[ay])
-                    rango2[ay]++;
-            }
-            return true;
-        }
+        int ax=this.representante(x);
+        int ay= this.representante(y);
+        this.print(x, y);
+        if(ax!=R[ay]&&ay!=R[ax]){
+           // System.out.println("formada");
+           int nuevoRepresentante=merge(ax,ay); 
+           int rival=this.merge(R[ax],R[ay]);
+           if(rival<A.length)
+              R[rival]=nuevoRepresentante;
+           R[nuevoRepresentante]=rival;
+          this.print(x,y);
+           return true;
+         }
         return false;
     }
-    void iterar(){
-        for (int i = 0; i < this.A.length; i++) {
-            if(A[i]==i){
-                System.out.print(i+" ");
-            }
-        }
-        System.out.println("");
-        for (int i = 0; i < this.A.length; i++) {
-            if(R[i]==-1){
-                System.out.print(i+" ");
-            }
-        }
-        System.out.println("");
+    boolean formarRival(int x, int y){
+        int ax=this.representante(x);
+        int ay=this.representante(y);
+        this.print(x, y);
+        if(ax!=ay){
+           // System.out.println("formada");
+            int representante_x=merge(ax,R[ay]);
+            int representante_y=merge(ay,R[ax]);
+            R[representante_x]=representante_y;
+            R[representante_y]=representante_x;
+            this.print(x,y);
+            return true;
+        } else
+        return false;
     }
-    
 
-}
-   class ConjuntosDisyuntos {
-    int[] conjunto;
-    int[] rango;
-
-    public ConjuntosDisyuntos(int tam) {
-
-      rango = new int[tam];
-      conjunto = new int[tam];
-        // Inicializa cada elemento en su propio conjunto
-      for (int x = 0; x < tam; x++)
-        conjunto[x] = x;
-    }
-      // Retorna el conjunto del elemento x
-      // Profundidad promedio de la recursiÃ³n no mayor a 5
-    int conjuntoDe(int x) {
-    
-      if (conjunto[x] == x)
-        return x;
-      return conjunto[x] = conjuntoDe(conjunto[x]);
-    }
-      // Une los dos conjuntos Cx, Cy a los que pertenecen x, y respectivamente.
-      // El conjunto de mayor rango absorve al de menor rango.
-      // Si tienen igual rango, cualquier conjunto puede absorver. En esta
-      // implementacio'n escogemos Cy absorve Cx
-    void unir(int x, int y) {
-    
-      int cx = conjuntoDe(x);
-      int cy = conjuntoDe(y);
+ 
+    public void print(int x, int y) {
+       // int ax=this.representante(x);
+        //int ay=this.representante(y);
+       // System.out.println(x+" A:"+ax+" R:"+R[ax]+"   "+y+" A:"+ay+" R:"+R[ay]);
       
-      if (rango[cx] > rango[cy])
-        conjunto[cy] = cx;
-      else {
-        conjunto[cx] = cy;
-        
-        if (rango[cx] == rango[cy])
-          rango[cy]++;
-      }
     }
-  }
+    
+    
+}
 
 public class Equipos {
     public static void main(String[] args) throws FileNotFoundException{
@@ -165,27 +122,27 @@ public class Equipos {
             if(cmd.equals("FormarAlianza")){
                 i=sc.nextInt();
                 j=sc.nextInt();
-               System.out.println("formar alianza  "+ i+" "+j);
+               //System.out.println("formar alianza  "+ i+" "+j);
                 if(!s.formarAlianza(i, j))
                     System.out.println("ERROR");
                 
             }if(cmd.equals("FormarRival")){
                 i=sc.nextInt();
                 j=sc.nextInt();
-                 System.out.println("formar rivalidad  "+ i+" "+j);
+               // System.out.println("formar rivalidad  "+ i+" "+j);
                 if(!s.formarRival(i, j))
                     System.out.println("ERROR");
                 
             }if(cmd.equals("Alianza")){
                 i=sc.nextInt();
                 j=sc.nextInt();
-                 System.out.println( i+" "+j+" son aliados?");
-                 System.out.println(s.alianza(i, j)?"SI":"NO");
+              // System.out.println( i+" "+j+" son aliados?");
+                System.out.println(s.alianza(i, j)?"SI":"NO");
                 
             }if(cmd.equals("Rival")){
                 i=sc.nextInt();
                 j=sc.nextInt();
-                System.out.println( i+" "+j+" son rivales?");
+                //System.out.println( i+" "+j+" son rivales?");
                 
                 System.out.println(s.rival(i, j)?"SI":"NO");
             }
